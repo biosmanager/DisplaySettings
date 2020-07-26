@@ -1,0 +1,23 @@
+{
+  "profiles": {
+    "DisplaySettingsChanger": {
+      "commandName": "Project"
+    },
+    "Store": {
+      "commandName": "Project",
+      "commandLineArgs": "store"
+    },
+    "Restore": {
+      "commandName": "Project",
+      "commandLineArgs": "restore"
+    },
+    "Set 1080p60": {
+      "commandName": "Project",
+      "commandLineArgs": "set -w 1920 -h 1080 -r 60"
+    },
+    "Set 1440p144": {
+      "commandName": "Project",
+      "commandLineArgs": "set -w 2560 -h 1440 -r 144"
+    }
+  }
+}
