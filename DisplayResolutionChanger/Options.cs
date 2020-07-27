@@ -34,5 +34,12 @@ namespace DisplaySettingsChanger
             [Option('r', "refreshRate", Required = false, HelpText = "Refresh rate in Hertz. A value of 0 or 1 indicates the default refresh rate of the display. A value below 0 does not change the current refresh rate (default).")]
             public int RefreshRate { get; set; } = -1;
         }
+
+        [Verb("enum", HelpText = "Enumerate all graphics modes of a given device.")]
+        public class EnumOptions
+        {
+            [Option('i', "displayIndex", Required = false, HelpText = "The index value of the display of interest. Default is 0.")]
+            public int DisplayIndex { get; set; } = 0;
+        }
     }
 }

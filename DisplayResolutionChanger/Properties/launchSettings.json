@@ -18,6 +18,10 @@
     "Set 1440p144": {
       "commandName": "Project",
       "commandLineArgs": "set -w 2560 -h 1440 -r 144"
+    },
+    "Enum": {
+      "commandName": "Project",
+      "commandLineArgs": "enum"
     }
   }
 }

@@ -12,6 +12,7 @@
 //-----------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace DisplaySettingsChanger
@@ -51,9 +52,16 @@ namespace DisplaySettingsChanger
         public string DeviceID;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
         public string DeviceKey;
+
+        public static DISPLAY_DEVICE Create()
+        {
+            var displayDevice = new DISPLAY_DEVICE();
+            displayDevice.cb = Marshal.SizeOf(displayDevice);
+            return displayDevice;
+        }
     }
 
-    [Flags()]
+    [Flags]
     public enum ChangeDisplaySettingsFlags : uint
     {
         CDS_NONE = 0,
@@ -70,52 +78,93 @@ namespace DisplaySettingsChanger
         CDS_NORESET = 0x10000000
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct DEVMODE
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         public string dmDeviceName;
-        public short dmSpecVersion;
-        public short dmDriverVersion;
-        public short dmSize;
-        public short dmDriverExtra;
-        public int dmFields;
-
-        public short dmOrientation;
-        public short dmPaperSize;
-        public short dmPaperLength;
-        public short dmPaperWidth;
-
-        public short dmScale;
-        public short dmCopies;
-        public short dmDefaultSource;
-        public short dmPrintQuality;
-        public short dmColor;
-        public short dmDuplex;
-        public short dmYResolution;
-        public short dmTTOption;
-        public short dmCollate;
+        [MarshalAs(UnmanagedType.U2)]
+        public UInt16 dmSpecVersion;
+        [MarshalAs(UnmanagedType.U2)]
+        public UInt16 dmDriverVersion;
+        [MarshalAs(UnmanagedType.U2)]
+        public UInt16 dmSize;
+        [MarshalAs(UnmanagedType.U2)]
+        public UInt16 dmDriverExtra;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmFields;
+        public POINTL dmPosition;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmDisplayOrientation;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmDisplayFixedOutput;
+        [MarshalAs(UnmanagedType.I2)]
+        public Int16 dmColor;
+        [MarshalAs(UnmanagedType.I2)]
+        public Int16 dmDuplex;
+        [MarshalAs(UnmanagedType.I2)]
+        public Int16 dmYResolution;
+        [MarshalAs(UnmanagedType.I2)]
+        public Int16 dmTTOption;
+        [MarshalAs(UnmanagedType.I2)]
+        public Int16 dmCollate;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         public string dmFormName;
-        public short dmLogPixels;
-        public short dmBitsPerPel;
-        public int dmPelsWidth;
-        public int dmPelsHeight;
-        public int dmPosition;
+        [MarshalAs(UnmanagedType.U2)]
+        public UInt16 dmLogPixels;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmBitsPerPel;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmPelsWidth;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmPelsHeight;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmDisplayFlags;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmDisplayFrequency;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmICMMethod;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmICMIntent;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmMediaType;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmDitherType;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmReserved1;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmReserved2;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmPanningWidth;
+        [MarshalAs(UnmanagedType.U4)]
+        public UInt32 dmPanningHeight;
 
-        public int dmDisplayFlags;
-        public int dmDisplayFrequency;
 
-        public int dmICMMethod;
-        public int dmICMIntent;
-        public int dmMediaType;
-        public int dmDitherType;
-        public int dmReserved1;
-        public int dmReserved2;
+        public static DEVMODE Create()
+        {
+            var dm = new DEVMODE();
+            dm.dmDeviceName = new string(new char[32]);
+            dm.dmFormName = new string(new char[32]);
+            dm.dmSize = (ushort)Marshal.SizeOf(dm);
+            return dm;
+        }
+    }
 
-        public int dmPanningWidth;
-        public int dmPanningHeight;
-    };
+    // 8-bytes structure
+    [StructLayout(LayoutKind.Sequential)]
+    public struct POINTL
+    {
+        public Int32 x;
+        public Int32 y;
+    }
+
+    [Flags]
+    public enum DEVMODE_FIELDS : int
+    {
+        DM_PELSWIDTH = 0x00080000,
+        DM_PELSHEIGHT = 0x00100000,
+        DM_DISPLAYFREQUENCY = 0x00400000
+    }
 
     [Flags()]
     public enum DISP_CHANGE : int
@@ -130,7 +179,7 @@ namespace DisplaySettingsChanger
         BADDUALVIEW = -6
     }
 
-    public class User_32
+    public class User32
     {
         [DllImport("user32.dll")]
         public static extern bool EnumDisplayDevices(string lpDevice, uint iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, uint dwFlags);
@@ -157,7 +206,7 @@ namespace DisplaySettingsChanger
         // int deviceIDIn : DeviceID of the monitor to be changed. DeviceID starts with 0 representing your first
         //                  monitor. For Laptops, the built-in display is usually 0.
 
-        static public string ChangeDisplaySettings(int width, int height, int refreshRate, int deviceID)
+        public static string ChangeDisplaySettings(int width, int height, int refreshRate, int deviceID)
         {
             //Basic Error Check
             if (deviceID < 0)
@@ -165,25 +214,24 @@ namespace DisplaySettingsChanger
                 deviceID = 0;
             }
 
-            DISPLAY_DEVICE d = new DISPLAY_DEVICE();
-            d.cb = Marshal.SizeOf(d);
+            DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
+            DEVMODE dm = DEVMODE.Create();
 
-            DEVMODE dm = GetDevMode();
+            // Get Device Information
+            User32.EnumDisplayDevices(null, (uint)deviceID, ref d, 1);
 
-            User_32.EnumDisplayDevices(null, (uint)deviceID, ref d, 1); //Get Device Information
-
-            //Attempt to change settings
-            if (0 != User_32.EnumDisplaySettingsEx(d.DeviceName, User_32.ENUM_CURRENT_SETTINGS, ref dm, 0))
+            // Attempt to change settings
+            if (0 != User32.EnumDisplaySettingsEx(d.DeviceName, User32.ENUM_CURRENT_SETTINGS, ref dm, 0))
             {
 
-                dm.dmPelsWidth = width;
-                dm.dmPelsHeight = height;
+                dm.dmPelsWidth = (uint)width;
+                dm.dmPelsHeight = (uint)height;
                 if (refreshRate >= 0)
                 {
-                    dm.dmDisplayFrequency = refreshRate;
+                    dm.dmDisplayFrequency = (uint)refreshRate;
                 }
 
-                int iRet = User_32.ChangeDisplaySettingsEx(d.DeviceName, ref dm, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_TEST, IntPtr.Zero);
+                int iRet = User32.ChangeDisplaySettingsEx(d.DeviceName, ref dm, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_TEST, IntPtr.Zero);
 
                 if (iRet == (int)DISP_CHANGE.FAILED)
                 {
@@ -191,7 +239,7 @@ namespace DisplaySettingsChanger
                 }
                 else
                 {
-                    iRet = User_32.ChangeDisplaySettingsEx(d.DeviceName, ref dm, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_UPDATEREGISTRY, IntPtr.Zero);
+                    iRet = User32.ChangeDisplaySettingsEx(d.DeviceName, ref dm, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_UPDATEREGISTRY, IntPtr.Zero);
 
                     switch (iRet)
                     {
@@ -218,7 +266,7 @@ namespace DisplaySettingsChanger
             }
         }
 
-        static public DisplaySettings GetDisplaySettings(int deviceID)
+        public static DisplaySettings GetDisplaySettings(int deviceID)
         {
             //Basic Error Check
             if (deviceID < 0)
@@ -226,32 +274,67 @@ namespace DisplaySettingsChanger
                 deviceID = 0;
             }
 
-            DISPLAY_DEVICE d = new DISPLAY_DEVICE();
-            d.cb = Marshal.SizeOf(d);
+            DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
+            DEVMODE dm = DEVMODE.Create();
 
-            DEVMODE dm = GetDevMode();
-
-            User_32.EnumDisplayDevices(null, (uint)deviceID, ref d, 1); //Get Device Information
+            // Get Device Information
+            User32.EnumDisplayDevices(null, (uint)deviceID, ref d, 1);
 
             // Retrieve display settings
-            User_32.EnumDisplaySettingsEx(d.DeviceName, User_32.ENUM_CURRENT_SETTINGS, ref dm, 0);
+            User32.EnumDisplaySettingsEx(d.DeviceName, User32.ENUM_CURRENT_SETTINGS, ref dm, 0);
 
             return new DisplaySettings()
             {
-                Width = dm.dmPelsWidth,
-                Height = dm.dmPelsHeight,
-                RefreshRate = dm.dmDisplayFrequency,
+                Width = (int)dm.dmPelsWidth,
+                Height = (int)dm.dmPelsHeight,
+                RefreshRate = (int)dm.dmDisplayFrequency,
                 DisplayIndex = deviceID
             };
         }
 
-        private static DEVMODE GetDevMode()
+        public static DisplaySettings[] EnumerateAllDisplayModes(int deviceID)
         {
-            DEVMODE dm = new DEVMODE();
-            dm.dmDeviceName = new String(new char[32]);
-            dm.dmFormName = new String(new char[32]);
-            dm.dmSize = (short)Marshal.SizeOf(dm);
-            return dm;
+            var displayModes = new List<DisplaySettings>();
+
+            //Basic Error Check
+            if (deviceID < 0)
+            {
+                deviceID = 0;
+            }
+
+            DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
+            DEVMODE dm = DEVMODE.Create();
+
+            // Get Device Information
+            User32.EnumDisplayDevices(null, (uint)deviceID, ref d, 1);
+
+            // Retrieve display settings
+            for (int iModeNum = 0; User32.EnumDisplaySettingsEx(d.DeviceName, iModeNum, ref dm, 0) != 0; iModeNum++)
+            {
+                displayModes.Add(new DisplaySettings()
+                {
+                    Width = (int)dm.dmPelsWidth,
+                    Height = (int)dm.dmPelsHeight,
+                    RefreshRate = (int)dm.dmDisplayFrequency,
+                    DisplayIndex = deviceID
+                });
+            }
+
+            return displayModes.ToArray();
+        }
+
+        public static (string, string) GetDisplayAndAdapterName(int deviceID)
+        {
+            //Basic Error Check
+            if (deviceID < 0)
+            {
+                deviceID = 0;
+            }
+
+            DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
+            User32.EnumDisplayDevices(null, (uint)deviceID, ref d, 1);
+
+            return (d.DeviceName, d.DeviceString);
         }
     }
 }

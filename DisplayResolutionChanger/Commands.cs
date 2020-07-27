@@ -57,5 +57,17 @@ namespace DisplaySettingsChanger
             DisplaySettings.ChangeDisplaySettings(width, height, refreshRate, displayIndex);
             Console.WriteLine($"Display {displayIndex} set to {width}x{height} @ {refreshRate} Hz");
         }
+
+        public static void EnumerateModes(int displayIndex)
+        {
+            var displayAndAdapterName = DisplaySettings.GetDisplayAndAdapterName(displayIndex);
+            var modes = DisplaySettings.EnumerateAllDisplayModes(displayIndex);
+            Console.WriteLine($"Graphics modes of display {displayIndex} ({displayAndAdapterName.Item1}, {displayAndAdapterName.Item2}):");
+            for (int modeIndex = 0; modeIndex < modes.Length; modeIndex++)
+            {
+                var mode = modes[modeIndex];
+                Console.WriteLine($"\t{modeIndex}: {mode.Width}x{mode.Height}@{mode.RefreshRate}");
+            }
+        }
     }
 }
