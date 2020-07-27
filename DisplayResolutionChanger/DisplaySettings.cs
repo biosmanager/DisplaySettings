@@ -1,15 +1,4 @@
-﻿//-----------------------------------------------------------------------------
-// Description: Sets resolution of a specified display through the call of
-//              ScreenResolution.ChangeResolution().
-//
-// Author: Timothy Mui (https://github.com/timmui)
-//
-// Date: Jan. 7, 2015
-//
-// Acknowledgements: Many thanks to Andy Schneider for providing the original code
-//                   for a single monitor.
-//                   TechNet (https://gallery.technet.microsoft.com/ScriptCenter/2a631d72-206d-4036-a3f2-2e150f297515/)
-//-----------------------------------------------------------------------------
+﻿// Based on https://github.com/timmui/ScreenResolutionChanger/blob/master/C%23%20Script/Set-ScreenResolutionEx.cs
 
 using System;
 using System.Collections.Generic;
@@ -17,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace DisplaySettingsChanger
 {
-    [Flags()]
+    [Flags]
     public enum DisplayDeviceStateFlags : int
     {
         /// <summary>The device is part of the desktop.</summary>
@@ -139,7 +128,6 @@ namespace DisplaySettingsChanger
         [MarshalAs(UnmanagedType.U4)]
         public UInt32 dmPanningHeight;
 
-
         public static DEVMODE Create()
         {
             var dm = new DEVMODE();
@@ -150,7 +138,6 @@ namespace DisplaySettingsChanger
         }
     }
 
-    // 8-bytes structure
     [StructLayout(LayoutKind.Sequential)]
     public struct POINTL
     {
@@ -191,8 +178,6 @@ namespace DisplaySettingsChanger
         public const int ENUM_CURRENT_SETTINGS = -1;
     }
 
-
-
     public class DisplaySettings
     {
         public int Width { get; set; }
@@ -200,25 +185,15 @@ namespace DisplaySettingsChanger
         public int RefreshRate { get; set; }
         public int DisplayIndex { get; set; }
 
-        // Arguments
-        // int width : Desired Width in pixels
-        // int height : Desired Height in pixels
-        // int deviceIDIn : DeviceID of the monitor to be changed. DeviceID starts with 0 representing your first
-        //                  monitor. For Laptops, the built-in display is usually 0.
-
-        public static string ChangeDisplaySettings(int width, int height, int refreshRate, int deviceID)
+        public static string ChangeDisplaySettings(int width, int height, int refreshRate, int displayIndex)
         {
-            //Basic Error Check
-            if (deviceID < 0)
-            {
-                deviceID = 0;
-            }
+            displayIndex = Math.Max(displayIndex, 0);
 
             DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
             DEVMODE dm = DEVMODE.Create();
 
             // Get Device Information
-            User32.EnumDisplayDevices(null, (uint)deviceID, ref d, 1);
+            User32.EnumDisplayDevices(null, (uint)displayIndex, ref d, 1);
 
             // Attempt to change settings
             if (0 != User32.EnumDisplaySettingsEx(d.DeviceName, User32.ENUM_CURRENT_SETTINGS, ref dm, 0))
@@ -266,19 +241,15 @@ namespace DisplaySettingsChanger
             }
         }
 
-        public static DisplaySettings GetDisplaySettings(int deviceID)
+        public static DisplaySettings GetCurrentDisplaySettings(int displayIndex)
         {
-            //Basic Error Check
-            if (deviceID < 0)
-            {
-                deviceID = 0;
-            }
+            displayIndex = Math.Max(displayIndex, 0);
 
             DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
             DEVMODE dm = DEVMODE.Create();
 
             // Get Device Information
-            User32.EnumDisplayDevices(null, (uint)deviceID, ref d, 1);
+            User32.EnumDisplayDevices(null, (uint)displayIndex, ref d, 1);
 
             // Retrieve display settings
             User32.EnumDisplaySettingsEx(d.DeviceName, User32.ENUM_CURRENT_SETTINGS, ref dm, 0);
@@ -288,25 +259,21 @@ namespace DisplaySettingsChanger
                 Width = (int)dm.dmPelsWidth,
                 Height = (int)dm.dmPelsHeight,
                 RefreshRate = (int)dm.dmDisplayFrequency,
-                DisplayIndex = deviceID
+                DisplayIndex = displayIndex
             };
         }
 
-        public static DisplaySettings[] EnumerateAllDisplayModes(int deviceID)
+        public static DisplaySettings[] EnumerateAllDisplaySettings(int displayIndex)
         {
             var displayModes = new List<DisplaySettings>();
 
-            //Basic Error Check
-            if (deviceID < 0)
-            {
-                deviceID = 0;
-            }
+            displayIndex = Math.Max(displayIndex, 0);
 
             DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
             DEVMODE dm = DEVMODE.Create();
 
             // Get Device Information
-            User32.EnumDisplayDevices(null, (uint)deviceID, ref d, 1);
+            User32.EnumDisplayDevices(null, (uint)displayIndex, ref d, 1);
 
             // Retrieve display settings
             for (int iModeNum = 0; User32.EnumDisplaySettingsEx(d.DeviceName, iModeNum, ref dm, 0) != 0; iModeNum++)
@@ -316,23 +283,19 @@ namespace DisplaySettingsChanger
                     Width = (int)dm.dmPelsWidth,
                     Height = (int)dm.dmPelsHeight,
                     RefreshRate = (int)dm.dmDisplayFrequency,
-                    DisplayIndex = deviceID
+                    DisplayIndex = displayIndex
                 });
             }
 
             return displayModes.ToArray();
         }
 
-        public static (string, string) GetDisplayAndAdapterName(int deviceID)
+        public static (string, string) GetDisplayAndAdapterName(int displayIndex)
         {
-            //Basic Error Check
-            if (deviceID < 0)
-            {
-                deviceID = 0;
-            }
+            displayIndex = Math.Max(displayIndex, 0);
 
             DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
-            User32.EnumDisplayDevices(null, (uint)deviceID, ref d, 1);
+            User32.EnumDisplayDevices(null, (uint)displayIndex, ref d, 1);
 
             return (d.DeviceName, d.DeviceString);
         }
