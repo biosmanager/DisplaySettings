@@ -60,13 +60,17 @@ namespace DisplaySettingsChanger
 
         public static void EnumerateModes(int displayIndex)
         {
-            var displayAndAdapterName = DisplaySettings.GetDisplayAndAdapterName(displayIndex);
+            var info = DisplayInformation.GetAdapterAndDisplayInformation(displayIndex);
             var modes = DisplaySettings.EnumerateAllDisplayModes(displayIndex);
-            Console.WriteLine($"Graphics modes of display {displayIndex} ({displayAndAdapterName.Item1}, {displayAndAdapterName.Item2}):");
+            Console.Write($"Display {displayIndex}:\n" +
+                          $"  Adapter: {info.adapterName} ({info.adapterDescription})\n" +
+                          $"  Monitor: {info.monitorName} ({info.monitorDescription})\n" +
+                          $"\n");
+            Console.WriteLine($"Graphics modes of display:");
             for (int modeIndex = 0; modeIndex < modes.Length; modeIndex++)
             {
                 var mode = modes[modeIndex];
-                Console.WriteLine($"\t{modeIndex}: {mode.Width}x{mode.Height}@{mode.RefreshRate}");
+                Console.WriteLine($"  {modeIndex}: \t{mode.Width}x{mode.Height}@{mode.RefreshRate}");
             }
         }
     }

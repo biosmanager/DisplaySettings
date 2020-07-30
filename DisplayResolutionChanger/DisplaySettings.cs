@@ -192,6 +192,33 @@ namespace DisplaySettingsChanger
     }
 
 
+    public sealed class DisplayInformation
+    {
+        public string adapterName;
+        public string adapterDescription;
+        public string monitorName;
+        public string monitorDescription;
+
+        public static DisplayInformation GetAdapterAndDisplayInformation(int deviceID)
+        {
+            if (deviceID < 0)
+            {
+                deviceID = 0;
+            }
+
+            DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
+
+            var displayInfo = new DisplayInformation();
+            User32.EnumDisplayDevices(null, (uint)deviceID, ref d, 0);
+            displayInfo.adapterName = d.DeviceName;
+            displayInfo.adapterDescription = d.DeviceString;
+            User32.EnumDisplayDevices(d.DeviceName, 0, ref d, 0);
+            displayInfo.monitorName = d.DeviceName;
+            displayInfo.monitorDescription = d.DeviceString;
+
+            return displayInfo;
+        }
+    }
 
     public class DisplaySettings
     {
@@ -321,20 +348,6 @@ namespace DisplaySettingsChanger
             }
 
             return displayModes.ToArray();
-        }
-
-        public static (string, string) GetDisplayAndAdapterName(int deviceID)
-        {
-            //Basic Error Check
-            if (deviceID < 0)
-            {
-                deviceID = 0;
-            }
-
-            DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
-            User32.EnumDisplayDevices(null, (uint)deviceID, ref d, 1);
-
-            return (d.DeviceName, d.DeviceString);
         }
     }
 }
