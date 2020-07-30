@@ -11,7 +11,7 @@ namespace DisplaySettingsChanger
 
         public static void StoreResolution(int deviceID)
         {
-            var displaySettings = DisplaySettings.GetDisplaySettings(deviceID);
+            var displaySettings = DisplaySettings.GetCurrentDisplaySettings(deviceID);
             var jsonString = JsonSerializer.Serialize(displaySettings);
 
             try
@@ -61,7 +61,7 @@ namespace DisplaySettingsChanger
         public static void EnumerateModes(int displayIndex)
         {
             var info = DisplayInformation.GetAdapterAndDisplayInformation(displayIndex);
-            var modes = DisplaySettings.EnumerateAllDisplayModes(displayIndex);
+            var modes = DisplaySettings.EnumerateAllDisplaySettings(displayIndex);
             Console.Write($"Display {displayIndex}:\n" +
                           $"  Adapter: {info.adapterName} ({info.adapterDescription})\n" +
                           $"  Monitor: {info.monitorName} ({info.monitorDescription})\n" +
