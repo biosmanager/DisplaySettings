@@ -21,7 +21,15 @@
     },
     "Enum": {
       "commandName": "Project",
-      "commandLineArgs": "enum"
+      "commandLineArgs": "modes -i 0"
+    },
+    "Get": {
+      "commandName": "Project",
+      "commandLineArgs": "get -i 1 -j"
+    },
+    "Displays": {
+      "commandName": "Project",
+      "commandLineArgs": "displays -a"
     }
   }
 }
