@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisplaySettingsChanger", "DisplayResolutionChanger\DisplaySettingsChanger.csproj", "{EFED097F-208E-4715-BC7C-8381A6D8194A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisplaySettingsChanger", "DisplaySettingsChanger\DisplaySettingsChanger.csproj", "{EFED097F-208E-4715-BC7C-8381A6D8194A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

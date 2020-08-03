@@ -1,6 +1,9 @@
 ﻿using CommandLine;
 using CommandLine.Text;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
@@ -20,9 +23,7 @@ namespace DisplaySettingsChanger
                 Environment.Exit(-1);
             }
 
-            parserResult = Parser.Default.ParseArguments<Options.StoreOptions, Options.RestoreOptions, Options.SetOptions, Options.StoreOptions, Options.RestoreOptions, Options.SetOptions, Options.GetOptions, Options.DisplaysOptions, Options.ModesOptions, Options.DisplaysOptions, Options.ModesOptions>(args)
-                .WithParsed<Options.StoreOptions>(options => Commands.StoreResolution(options.DisplayIndex))
-                .WithParsed<Options.RestoreOptions>(options => Commands.RestoreResolution())
+            parserResult = Parser.Default.ParseArguments<Options.SetOptions, Options.GetOptions, Options.DisplaysOptions>(args)
                 .WithParsed<Options.SetOptions>(options =>
                 {
                     if (options.DoReadJson)
@@ -85,6 +86,17 @@ namespace DisplaySettingsChanger
         static string GetHelp<T>(ParserResult<T> result)
         {
             return HelpText.AutoBuild(result, h => h, e => e);
+        }
+
+        static void ParseDisplays(string[] displays)
+        {
+            if (displays.Length == 1)
+            {
+                switch (displays[0])
+                {
+                    case 
+                }
+            }
         }
     }
 }
