@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace DisplaySettingsChanger
@@ -22,6 +23,9 @@ namespace DisplaySettingsChanger
         [Verb("set", HelpText = "Set display settings.")]
         public class SetOptions
         {
+            [Option('j', "json", Required = false, HelpText = "Read display settings formatted as JSON string.", Default = null)]
+            public bool DoReadJson { get; set; } = false;
+
             [Option('i', "displayIndex", Required = false, HelpText = "The index value of the display of interest. Default is 0.")]
             public int DisplayIndex { get; set; } = 0;
 
@@ -47,8 +51,8 @@ namespace DisplaySettingsChanger
         [Verb("get", HelpText = "Get current display settings.")]
         public class GetOptions
         {
-            [Option('i', "displayIndex", Required = false, HelpText = "The index value of the display of interest. Default is 0.")]
-            public int DisplayIndex { get; set; } = 0;
+            [Option('d', "display", Required = false, HelpText = "The display of interest. Can be either a display index (>= 0) or a \"primary\" to use the current primary display. Default is 0.")]
+            public string Display { get; set; } = "primary";
 
             [Option('j', "json", Required = false, HelpText = "Format as JSON.")]
             public bool DoJsonFormatting { get; set; } = false;

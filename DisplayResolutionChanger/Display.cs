@@ -274,10 +274,7 @@ namespace DisplaySettingsChanger
         }
 
         public int DisplayIndex { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int RefreshRate { get; set; }
-        public int BitDepth { get; set; }
+        public GraphicsMode Mode { get; set; }
         public Position DesktopPosition { get; set; }
 
         public static DISP_CHANGE ChangeDisplaySettings(int displayIndex, int? width = null, int? height = null, int? refreshRate = null, int? bitDepth = null, int? positionX = null, int? positionY = null)
@@ -349,10 +346,13 @@ namespace DisplaySettingsChanger
             return new DisplaySettings()
             {
                 DisplayIndex = displayIndex,
-                Width = (int)dm.dmPelsWidth,
-                Height = (int)dm.dmPelsHeight,
-                RefreshRate = (int)dm.dmDisplayFrequency,
-                BitDepth = (int)dm.dmBitsPerPel,
+                Mode = new GraphicsMode
+                {
+                    Width = (int)dm.dmPelsWidth,
+                    Height = (int)dm.dmPelsHeight,
+                    RefreshRate = (int)dm.dmDisplayFrequency,
+                    BitDepth = (int)dm.dmBitsPerPel
+                },
                 DesktopPosition = new Position { X = dm.dmPosition.x, Y = dm.dmPosition.y }
             };
         }

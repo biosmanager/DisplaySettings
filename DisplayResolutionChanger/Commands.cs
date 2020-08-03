@@ -16,7 +16,7 @@ namespace DisplaySettingsChanger
             try
             {
                 Environment.SetEnvironmentVariable(ENV_VAR, jsonString, EnvironmentVariableTarget.User);
-                Console.WriteLine($"Stored display settings: {displaySettings.Width}x{displaySettings.Height} @ {displaySettings.RefreshRate} Hz");
+                Console.WriteLine($"Stored display settings: {displaySettings.Mode.Width}x{displaySettings.Mode.Height} @ {displaySettings.Mode.RefreshRate} Hz");
             }
             catch (SecurityException e)
             {
@@ -30,7 +30,7 @@ namespace DisplaySettingsChanger
             {
                 var jsonString = Environment.GetEnvironmentVariable(ENV_VAR, EnvironmentVariableTarget.User);
                 var displaySettings = JsonSerializer.Deserialize<DisplaySettings>(jsonString);
-                SetResolution(displaySettings.DisplayIndex, displaySettings.Width, displaySettings.Height, displaySettings.RefreshRate);
+                SetResolution(displaySettings.DisplayIndex, displaySettings.Mode.Width, displaySettings.Mode.Height, displaySettings.Mode.RefreshRate);
 
                 // Delete environment variable
                 Environment.SetEnvironmentVariable(ENV_VAR, null, EnvironmentVariableTarget.User);
@@ -90,9 +90,9 @@ namespace DisplaySettingsChanger
             else
             {
                 Console.Write($"Display {displayIndex}:\n" +
-                          $"  Resolution: \t\t{displaySettings.Width}x{displaySettings.Height}\n" +
-                          $"  Refresh rate: \t{displaySettings.RefreshRate} Hz\n" +
-                          $"  Color bit depth: \t{displaySettings.BitDepth} bit\n" +
+                          $"  Resolution: \t\t{displaySettings.Mode.Width}x{displaySettings.Mode.Height}\n" +
+                          $"  Refresh rate: \t{displaySettings.Mode.RefreshRate} Hz\n" +
+                          $"  Color bit depth: \t{displaySettings.Mode.BitDepth} bit\n" +
                           $"  Desktop position: \t({displaySettings.DesktopPosition.X}, {displaySettings.DesktopPosition.Y})\n");
             }
         }
