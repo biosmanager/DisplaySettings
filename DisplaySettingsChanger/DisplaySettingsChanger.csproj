@@ -4,10 +4,27 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>DisplaySettingsChanger</AssemblyName>
+    <Authors>biosmanager</Authors>
+    <Product />
+    <Description>The swiss army knife to change or retrieve display settings from the command line or scripts on Windows.</Description>
+    <Version>0.5.0</Version>
+    <RepositoryUrl>https://github.com/biosmanager/DisplaySettingsChanger</RepositoryUrl>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <Copyright>2020 biosmanager</Copyright>
+    <PackageProjectUrl>https://github.com/biosmanager/DisplaySettingsChanger</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <Company />
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
