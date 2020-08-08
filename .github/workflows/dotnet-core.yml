@@ -24,7 +24,7 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish --configuration -p:PublishProfile=FolderProfile
+      run: dotnet publish --configuration Release -p:PublishProfile=FolderProfile
     - name: Artifact
       uses: actions/upload-artifact@v2
       with:
