@@ -44,4 +44,4 @@ jobs:
         title: "Latest build"
         files: |
           LICENSE.md
-          /home/runner/work/artifact/DisplaySettingsChanger.zip
+          /home/runner/work/artifact/DisplaySettingsChanger
