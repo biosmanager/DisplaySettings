@@ -13,8 +13,8 @@ namespace DisplaySettingsChanger
                                 "(resolution, bit depth, etc.) untouched.")]
         public class SetOptions
         {
-            [Option('d', "displays", Separator = ',', Required = false, HelpText = "The display(s) of interest. Can be either a comma-separated sequence of " +
-                                                                  "display indices (>= 0), \"all\", \"attached\" or \"primary\" (default).")]
+            [Option('d', "displays", Default = new string[] { "primary" }, Separator = ',', Required = false, HelpText = "The display(s) of interest. Can be either a comma-separated sequence of " +
+                                                                  "display indices (>= 0), \"all\", \"attached\" or \"primary\".")]
             public IEnumerable<string> Displays { get; set; }
 
             [Option('w', "width", Required = false, HelpText = "Width in pixels.")]
@@ -26,13 +26,13 @@ namespace DisplaySettingsChanger
             [Option('r', "refreshRate", Required = false, HelpText = "Refresh rate in Hertz. A value of 0 or 1 indicates the default refresh rate of the display.")]
             public int? RefreshRate { get; set; } = null;
 
-            [Option('b', "bitDepth", Required = false)]
+            [Option('b', "bitDepth", Required = false, HelpText = "Bits per pixel for all channels including alpha.")]
             public int? BitDepth { get; set; } = null;
 
-            [Option("positionX", Required = false)]
+            [Option("positionX", Required = false, HelpText = "X position of the display in the multi-monitor desktop configuration. The primary display has (0, 0).")]
             public int? PositionX { get; set; } = null;
 
-            [Option("positionY", Required = false)]
+            [Option("positionY", Required = false, HelpText = "Y position of the display in the multi-monitor desktop configuration. The primary display has (0, 0).")]
             public int? PositionY { get; set; } = null;
 
             [Option('j', "json", Required = false, HelpText = "Read display settings formatted as JSON from a file." +
@@ -49,7 +49,7 @@ namespace DisplaySettingsChanger
         public class GetOptions
         {
             [Option('d', "displays", Default = new string[] { "primary" }, Separator = ',', Required = false, HelpText = "The display(s) of interest. Can be either a comma-separated sequence of " +
-                                                                  "display indices (>= 0), \"all\", \"attached\" or \"primary\" (default).")]
+                                                                  "display indices (>= 0), \"all\", \"attached\" or \"primary\".")]
             public IEnumerable<string> Displays { get; set; }
 
             [Option('j', "json", Required = false, HelpText = "Write display settings formatted as JSON to a file.")]
@@ -76,7 +76,7 @@ namespace DisplaySettingsChanger
         public class ModesOptions
         {
             [Option('d', "displays", Default = new string[] { "primary" }, Separator = ',', Required = false, HelpText = "The display(s) of interest. Can be either a comma-separated sequence of " +
-                                                                  "display indices (>= 0), \"all\", \"attached\" or \"primary\" (default).")]
+                                                                  "display indices (>= 0), \"all\", \"attached\" or \"primary\".")]
             public IEnumerable<string> Displays { get; set; }
 
             [Option('j', "json", Required = false, HelpText = "Write modes formatted as JSON to a file." +
