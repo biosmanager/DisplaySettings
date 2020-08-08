@@ -24,9 +24,9 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish
+      run: dotnet publish --configuration Release
     - name: Artifact
       uses: actions/upload-artifact@v2
       with:
         name: DisplaySettingsChanger
-        path: /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/bin/Release/netcoreapp3.1/publish/
+        path: /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger/bin/Release/netcoreapp3.1/publish/
