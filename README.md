@@ -1,6 +1,6 @@
 # Display Settings Changer
 
-The swiss army knife to change display settings from the command line or scripts.
+The swiss army knife to change display settings from the command line or scripts on Windows.
 
 ## Features
 
