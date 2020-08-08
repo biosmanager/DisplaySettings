@@ -24,7 +24,7 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish --configuration Release --runtime win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true
+      run: dotnet publish -p:PublishProfile=FolderProfile
     - name: Artifact
       uses: actions/upload-artifact@v2
       with:
