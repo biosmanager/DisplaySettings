@@ -29,7 +29,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: DisplaySettingsChanger-Windows-x64
-        path: /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger/bin/Release/netcoreapp3.1/publish/
+        path: /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/bin/Release/netcoreapp3.1/publish
     - name: Download artifact
       uses: actions/download-artifact@v2
       with:
