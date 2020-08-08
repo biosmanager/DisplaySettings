@@ -1,0 +1,54 @@
+[
+  {
+    "DisplayIndex": 0,
+    "Mode": {
+      "Width": 2560,
+      "Height": 1440,
+      "RefreshRate": 144,
+      "BitDepth": 32
+    },
+    "DesktopPosition": {
+      "X": 0,
+      "Y": 0
+    }
+  },
+  {
+    "DisplayIndex": 1,
+    "Mode": {
+      "Width": 1920,
+      "Height": 1080,
+      "RefreshRate": 60,
+      "BitDepth": 32
+    },
+    "DesktopPosition": {
+      "X": 2560,
+      "Y": 0
+    }
+  },
+  {
+    "DisplayIndex": 2,
+    "Mode": {
+      "Width": 1920,
+      "Height": 1080,
+      "RefreshRate": 60,
+      "BitDepth": 32
+    },
+    "DesktopPosition": {
+      "X": -1920,
+      "Y": 0
+    }
+  },
+  {
+    "DisplayIndex": 3,
+    "Mode": {
+      "Width": 3840,
+      "Height": 2160,
+      "RefreshRate": 60,
+      "BitDepth": 32
+    },
+    "DesktopPosition": {
+      "X": 4480,
+      "Y": 0
+    }
+  }
+]

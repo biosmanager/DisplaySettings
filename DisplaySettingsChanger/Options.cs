@@ -14,8 +14,8 @@ namespace DisplaySettingsChanger
         public class SetOptions
         {
             [Option('d', "displays", Separator = ',', Required = false, HelpText = "The display(s) of interest. Can be either a comma-separated sequence of " +
-                                                                  "display indices (>= 0), \"all\" or \"primary\" (default).")]
-            public IEnumerable<string> Displays { get; set; } = new string[] { "primary" };
+                                                                  "display indices (>= 0), \"all\", \"attached\" or \"primary\" (default).")]
+            public IEnumerable<string> Displays { get; set; }
 
             [Option('w', "width", Required = false, HelpText = "Width in pixels.")]
             public int? Width { get; set; } = null;
@@ -35,22 +35,28 @@ namespace DisplaySettingsChanger
             [Option("positionY", Required = false)]
             public int? PositionY { get; set; } = null;
 
-            [Option('j', "json", Required = false, HelpText = "Read display settings formatted as JSON string. If other options are present, " +
-                                                              "they will override the respective settings from the JSON settings. When overriding " +
-                                                              "the display(s) of interest, the number of displays must match the number of displays" + 
+            [Option('j', "json", Required = false, HelpText = "Read display settings formatted as JSON from a file." +
+                                                              "If other options are present, they will override the respective settings from the JSON settings. When overriding " +
+                                                              "the display(s) of interest, the number of displays must match the number of displays" +
                                                               "in the JSON string.")]
-            public bool DoReadJson { get; set; } = false;
+            public bool DoJsonFormatting { get; set; } = false;
+
+            [Option('f', "file", Required = false, HelpText = "Path to JSON file. If this option is ommited, read from standard input instead. ")]
+            public string JsonFilePath { get; set; } = null;
         }
 
         [Verb("get", HelpText = "Get current display settings.")]
         public class GetOptions
         {
-            [Option('d', "displays", Separator = ',', Required = false, HelpText = "The display(s) of interest. Can be either a comma-separated sequence of " +
-                                                                  "display indices (>= 0), \"all\" or \"primary\" (default).")]
-            public IEnumerable<string> Displays { get; set; } = new string[] { "primary" };
+            [Option('d', "displays", Default = new string[] { "primary" }, Separator = ',', Required = false, HelpText = "The display(s) of interest. Can be either a comma-separated sequence of " +
+                                                                  "display indices (>= 0), \"all\", \"attached\" or \"primary\" (default).")]
+            public IEnumerable<string> Displays { get; set; }
 
-            [Option('j', "json", Required = false, HelpText = "Format as JSON.")]
+            [Option('j', "json", Required = false, HelpText = "Write display settings formatted as JSON to a file.")]
             public bool DoJsonFormatting { get; set; } = false;
+
+            [Option('f', "file", Required = false, HelpText = "Path to JSON file. If this option is ommited, write to standard output instead.")]
+            public string JsonFilePath { get; set; } = null;
         }
 
         [Verb("displays", HelpText = "Enumerate all displays.")]
@@ -59,19 +65,28 @@ namespace DisplaySettingsChanger
             [Option('a', "attached", Required = false, HelpText = "Only list displays that are attached to the desktop.")]
             public bool DoOnlyListAttached { get; set; } = false;
 
-            [Option('j', "json", Required = false, HelpText = "Format as JSON.")]
+            [Option('j', "json", Required = false, HelpText = "Write display information formatted as JSON to a file.")]
             public bool DoJsonFormatting { get; set; } = false;
+
+            [Option('f', "file", Required = false, HelpText = "Path to JSON file. If this option is ommited, write to standard output instead.")]
+            public string JsonFilePath { get; set; } = null;
         }
 
         [Verb("modes", HelpText = "Enumerate all graphics modes of a display.")]
         public class ModesOptions
         {
-            [Option('d', "displays", Separator = ',', Required = false, HelpText = "The display(s) of interest. Can be either a comma-separated sequence of " +
-                                                                  "display indices (>= 0), \"all\" or \"primary\" (default).")]
-            public IEnumerable<string> Displays { get; set; } = new string[] { "primary" };
+            [Option('d', "displays", Default = new string[] { "primary" }, Separator = ',', Required = false, HelpText = "The display(s) of interest. Can be either a comma-separated sequence of " +
+                                                                  "display indices (>= 0), \"all\", \"attached\" or \"primary\" (default).")]
+            public IEnumerable<string> Displays { get; set; }
 
-            [Option('j', "json", Required = false, HelpText = "Format as JSON.")]
+            [Option('j', "json", Required = false, HelpText = "Write modes formatted as JSON to a file." +
+                                                              "If other options are present, they will override the respective settings from the JSON settings. When overriding " +
+                                                              "the display(s) of interest, the number of displays must match the number of displays" +
+                                                              "in the JSON string.")]
             public bool DoJsonFormatting { get; set; } = false;
+
+            [Option('f', "file", Required = false, HelpText = "Path to JSON file. If this option is ommited, write to standard output instead.")]
+            public string JsonFilePath { get; set; } = null;
         }
     }
 }

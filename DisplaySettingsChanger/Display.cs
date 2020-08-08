@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 namespace DisplaySettingsChanger
 {
@@ -121,18 +123,23 @@ namespace DisplaySettingsChanger
         BADDUALVIEW = -6
     }
 
+    // Flags based on wingdi.h from Windows SDK 10.0.16299.0
     [Flags]
     public enum DisplayDeviceStateFlags : int
     {
-        AttachedToDesktop = 0x1,
-        MultiDriver = 0x2,
-        PrimaryDevice = 0x4,
-        MirroringDriver = 0x8,
-        VGACompatible = 0x10,
-        Removable = 0x20,
-        ModesPruned = 0x8000000,
-        Remote = 0x4000000,
-        Disconnect = 0x2000000
+        AttachedToDesktop = 0x00000001,
+        MultiDriver       = 0x00000002,
+        PrimaryDevice     = 0x00000004,
+        MirroringDriver   = 0x00000008,
+        VgaCompatible     = 0x00000010,
+        Removable         = 0x00000020,
+        AccDriver         = 0x00000040,
+        ModesPruned       = 0x08000000,
+        RdpUdd            = 0x01000000,
+        Remote            = 0x04000000,
+        Disconnect        = 0x02000000,
+        TSCompatible      = 0x00200000,
+        UnsafeModesOn     = 0x00080000
     }
 
     [Flags]
@@ -255,12 +262,28 @@ namespace DisplaySettingsChanger
 
             return displayInformations.ToArray();
         }
+
+        public static int FindPrimaryDisplayIndex()
+        {
+            var devices = EnumerateAllDisplays(true);
+            foreach (var device in devices)
+            {
+                if (device.AdapterStateFlags.HasFlag(DisplayDeviceStateFlags.PrimaryDevice))
+                {
+                    return device.DisplayIndex;
+                }
+            }
+
+            // TODO: Is this the correct exception type? Should we throw a exception in this highly unlikely case at all?
+            throw new ExternalException("No primary display attached! This should never happen.");
+        }
     }
 
     public sealed class DisplaySettings
     {
         public sealed class GraphicsMode
         {
+            public int Index { get; set; }
             public int Width { get; set; }
             public int Height { get; set; }
             public int RefreshRate { get; set; }
@@ -276,42 +299,25 @@ namespace DisplaySettingsChanger
         public int DisplayIndex { get; set; }
         public GraphicsMode Mode { get; set; }
         public Position DesktopPosition { get; set; }
+        public bool IsAttached { get; set; }
 
-        public static DISP_CHANGE ChangeDisplaySettings(int displayIndex, int? width = null, int? height = null, int? refreshRate = null, int? bitDepth = null, int? positionX = null, int? positionY = null)
+        public static DISP_CHANGE ChangeDisplaySettings(DisplaySettings displaySettings)
         {
-            displayIndex = Math.Max(displayIndex, 0);
+            displaySettings.DisplayIndex = Math.Max(displaySettings.DisplayIndex, 0);
 
             DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
             DEVMODE dm = DEVMODE.Create();
 
-            User32.EnumDisplayDevices(null, (uint)displayIndex, ref d, 1);
+            User32.EnumDisplayDevices(null, (uint)displaySettings.DisplayIndex, ref d, 1);
 
             if (0 != User32.EnumDisplaySettingsEx(d.DeviceName, User32.ENUM_CURRENT_SETTINGS, ref dm, 0))
             {
-                if (width != null)
-                {
-                    dm.dmPelsWidth = (uint)width;
-                }
-                if (height != null)
-                {
-                    dm.dmPelsHeight = (uint)height;
-                }
-                if (refreshRate != null)
-                {
-                    dm.dmDisplayFrequency = (uint)refreshRate;
-                }
-                if (bitDepth != null)
-                {
-                    dm.dmBitsPerPel = (uint)bitDepth;
-                }
-                if (positionX != null)
-                {
-                    dm.dmPosition.x = (int)positionX;
-                }
-                if (positionY != null)
-                {
-                    dm.dmPosition.y = (int)positionY;
-                }
+                dm.dmPelsWidth = (uint)displaySettings.Mode.Width;
+                dm.dmPelsHeight = (uint)displaySettings.Mode.Height;
+                dm.dmDisplayFrequency = (uint)displaySettings.Mode.RefreshRate;
+                dm.dmBitsPerPel = (uint)displaySettings.Mode.BitDepth;
+                dm.dmPosition.x = displaySettings.DesktopPosition.X;
+                dm.dmPosition.y = displaySettings.DesktopPosition.Y;
 
                 int iRet = User32.ChangeDisplaySettingsEx(d.DeviceName, ref dm, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_TEST, IntPtr.Zero);
 
@@ -325,7 +331,6 @@ namespace DisplaySettingsChanger
 
                     return (DISP_CHANGE)iRet;
                 }
-
             }
             else
             {
@@ -341,9 +346,10 @@ namespace DisplaySettingsChanger
             DEVMODE dm = DEVMODE.Create();
 
             User32.EnumDisplayDevices(null, (uint)displayIndex, ref d, 1);
+            var isAttached = d.StateFlags.HasFlag(DisplayDeviceStateFlags.AttachedToDesktop);
             User32.EnumDisplaySettingsEx(d.DeviceName, User32.ENUM_CURRENT_SETTINGS, ref dm, 0);
 
-            return new DisplaySettings()
+            var displaySettings = new DisplaySettings()
             {
                 DisplayIndex = displayIndex,
                 Mode = new GraphicsMode
@@ -353,8 +359,27 @@ namespace DisplaySettingsChanger
                     RefreshRate = (int)dm.dmDisplayFrequency,
                     BitDepth = (int)dm.dmBitsPerPel
                 },
-                DesktopPosition = new Position { X = dm.dmPosition.x, Y = dm.dmPosition.y }
+                DesktopPosition = new Position { X = dm.dmPosition.x, Y = dm.dmPosition.y },
+                IsAttached = isAttached
             };
+
+            // Find mode number
+            displaySettings.Mode.Index = -1;
+            for (int iModeNum = 0; User32.EnumDisplaySettingsEx(d.DeviceName, iModeNum, ref dm, 0) != 0; iModeNum++)
+            {
+                var isModeMatch = displaySettings.Mode.Width == dm.dmPelsWidth &&
+                                  displaySettings.Mode.Height == dm.dmPelsHeight &&
+                                  displaySettings.Mode.RefreshRate == dm.dmDisplayFrequency &&
+                                  displaySettings.Mode.BitDepth == dm.dmBitsPerPel;
+
+                if (isModeMatch)
+                {
+                    displaySettings.Mode.Index = iModeNum;
+                    break;
+                }
+            }
+
+            return displaySettings;
         }
 
         public static GraphicsMode[] EnumerateAllDisplayModes(int displayIndex)
@@ -372,6 +397,7 @@ namespace DisplaySettingsChanger
             {
                 displayModes.Add(new GraphicsMode
                 {
+                    Index = iModeNum,
                     Width = (int)dm.dmPelsWidth,
                     Height = (int)dm.dmPelsHeight,
                     RefreshRate = (int)dm.dmDisplayFrequency,

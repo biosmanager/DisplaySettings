@@ -21,15 +21,19 @@
     },
     "Enum": {
       "commandName": "Project",
-      "commandLineArgs": "modes -i 0"
+      "commandLineArgs": "modes -j -d all"
     },
     "Get": {
       "commandName": "Project",
-      "commandLineArgs": "get -d primard -j"
+      "commandLineArgs": "get -j -d all"
     },
     "Displays": {
       "commandName": "Project",
-      "commandLineArgs": "displays -a"
+      "commandLineArgs": "displays -j -a"
+    },
+    "Set all": {
+      "commandName": "Project",
+      "commandLineArgs": "set -j"
     }
   }
 }
