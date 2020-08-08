@@ -1,4 +1,4 @@
-# Display Settings Changer
+# Display Settings Changer ![.NET Core](https://github.com/biosmanager/DisplaySettingsChanger/workflows/.NET%20Core/badge.svg)
 
 The swiss army knife to change display settings from the command line or scripts on Windows.
 
