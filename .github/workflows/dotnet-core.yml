@@ -24,7 +24,7 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish --configuration Release -p:PublishProfile=FolderProfile
+      run: dotnet publish /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger.csproj -p:PublishProfileFullPath=/home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger/Properties/PublishProfiles/FolderProfile.pubxml
     - name: Artifact
       uses: actions/upload-artifact@v2
       with:
@@ -35,7 +35,8 @@ jobs:
       with:
         name: DisplaySettingsChanger-Windows-x64
         path: /home/runner/work/artifact/
-    - run: mv /home/runner/work/artifact/DisplaySettingsChanger-Windows-x64 /home/runner/work/artifact/DisplaySettingsChanger-Windows-x64.zip
+    - name: Rename artifact
+      run: mv /home/runner/work/artifact/DisplaySettingsChanger-Windows-x64 /home/runner/work/artifact/DisplaySettingsChanger-Windows-x64.zip
     - name: Auto-release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
