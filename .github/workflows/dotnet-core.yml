@@ -32,7 +32,7 @@ jobs:
       run: dotnet publish -p:PublishProfile=Release-Windows-x64-Single
       
     - name: Zip
-      run: mkdir -p /home/runner/work/DisplaySettingsChanger/artifact/-p && zip -r /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger/bin/Release/netcoreapp3.1/publish/
+      run: mkdir -p /home/runner/work/DisplaySettingsChanger/artifact/-p && zip -j -r /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger/bin/Release/netcoreapp3.1/publish/
       
     - name: Artifact
       uses: actions/upload-artifact@v2
@@ -41,11 +41,11 @@ jobs:
         path: /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip
         
     - name: Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: "marvinpinto/action-automatic-releases@latest"
       with:
-        tag_name: latest
-        release_name: Latest build
-        draft: false
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
         prerelease: true
+        title: "Latest build"
+        files: |
+          /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip
