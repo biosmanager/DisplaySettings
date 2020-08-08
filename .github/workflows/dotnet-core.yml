@@ -24,17 +24,18 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish --configuration Release
+      run: dotnet publish --configuration Release --runtime win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true
     - name: Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: DisplaySettingsChanger
+        name: DisplaySettingsChanger-Windows-x64
         path: /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger/bin/Release/netcoreapp3.1/publish/
     - name: Download artifact
       uses: actions/download-artifact@v2
       with:
-        name: DisplaySettingsChanger
+        name: DisplaySettingsChanger-Windows-x64
         path: /home/runner/work/artifact/
+    - run: mv /home/runner/work/artifact/DisplaySettingsChanger-Windows-x64 /home/runner/work/artifact/DisplaySettingsChanger-Windows-x64.zip
     - name: Auto-release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
@@ -44,4 +45,4 @@ jobs:
         title: "Latest build"
         files: |
           LICENSE.md
-          /home/runner/work/artifact/DisplaySettingsChanger
+          /home/runner/work/artifact/DisplaySettingsChanger-Windows-x64.zip
