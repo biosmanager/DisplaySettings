@@ -32,7 +32,7 @@ jobs:
       run: dotnet publish -p:PublishProfile=Release-Windows-x64-Single
       
     - name: Zip
-      run: zip -r /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger/bin/Release/netcoreapp3.1/publish/
+      run: mkdir -p /home/runner/work/DisplaySettingsChanger/artifact/-p && zip -r /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger/bin/Release/netcoreapp3.1/publish/
       
     - name: Artifact
       uses: actions/upload-artifact@v2
