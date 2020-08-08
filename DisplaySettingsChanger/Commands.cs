@@ -187,7 +187,7 @@ namespace DisplaySettingsChanger
                 var colorDepthName = Util.BitDepthToName(displaySettings.Mode.BitDepth);
                 if (result == DISP_CHANGE.SUCCESSFUL)
                 {
-                    Console.WriteLine($"Display {displaySettings.DisplayIndex}: Set to {width}x{height} @ {refreshRate} Hz");
+                    Console.WriteLine($"Display {displaySettings.DisplayIndex}: Set to {displaySettings.Mode.Width}x{displaySettings.Mode.Height} @ {displaySettings.Mode.RefreshRate} Hz, {displaySettings.Mode.BitDepth} bit{(colorDepthName == "" ? "" : $" ({colorDepthName})")}");
                 }
                 else if (result == DISP_CHANGE.RESTART)
                 {
