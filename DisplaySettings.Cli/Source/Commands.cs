@@ -8,7 +8,7 @@ using System.Text.Json;
 using CommandLine;
 using Extensions;
 
-namespace DisplaySettingsChanger
+namespace DisplaySettings.Cli
 {
     public static class Commands
     {
@@ -138,7 +138,7 @@ namespace DisplaySettingsChanger
             {
                 foreach (var displayIndex in displayIndices)
                 {
-                    displaysSettings.Add(DisplaySettings.GetCurrentDisplaySettings(displayIndex));
+                    displaysSettings.Add(DisplaySettings.GetDisplaySettings(displayIndex));
                 }
             }
 
@@ -185,27 +185,21 @@ namespace DisplaySettingsChanger
                 var result = DisplaySettings.ChangeDisplaySettings(displaySettings);
 
                 var colorDepthName = Util.BitDepthToName(displaySettings.Mode.BitDepth);
-                if (result == DISP_CHANGE.SUCCESSFUL)
+                if (result.Status == DisplaySettings.DisplaySettingsChangedResult.ChangeStatus.SUCCESSFUL)
                 {
                     Console.WriteLine($"Display {displaySettings.DisplayIndex}: Set to {displaySettings.Mode.Width}x{displaySettings.Mode.Height} @ {displaySettings.Mode.RefreshRate} Hz, {displaySettings.Mode.BitDepth} bit{(colorDepthName == "" ? "" : $" ({colorDepthName})")}");
                 }
-                else if (result == DISP_CHANGE.RESTART)
+                else if (result.Status == DisplaySettings.DisplaySettingsChangedResult.ChangeStatus.RESTART)
                 {
-                    Console.WriteLine("You must restart your computer to apply the requested graphics mode.");
+                    Console.WriteLine($"Display {displaySettings.DisplayIndex}: {result.Description}");
+                }
+                else if (result.Status == DisplaySettings.DisplaySettingsChangedResult.ChangeStatus.BADMODE)
+                {
+                    throw new CommandException("set", $"Display {displaySettings.DisplayIndex}: The requested graphics mode {displaySettings.Mode.Width}x{displaySettings.Mode.Height} @ {displaySettings.Mode.RefreshRate} Hz, {displaySettings.Mode.BitDepth} bit{(colorDepthName == "" ? "" : $" ({colorDepthName})")} is not supported.");
                 }
                 else
                 {
-                    var errorMessage = result switch
-                    {
-                        DISP_CHANGE.BADDUALVIEW => "Bad dual view.",
-                        DISP_CHANGE.BADFLAGS => "Invalid set of flags passed.",
-                        DISP_CHANGE.BADMODE => $"The requested graphics mode {displaySettings.Mode.Width}x{displaySettings.Mode.Height} @ {displaySettings.Mode.RefreshRate} Hz, {displaySettings.Mode.BitDepth} bit{(colorDepthName == "" ? "" : $" ({colorDepthName})")} is not supported.",
-                        DISP_CHANGE.BADPARAM => "Invalid parameter passed.",
-                        DISP_CHANGE.FAILED => "Display driver failed requested graphics mode.",
-                        DISP_CHANGE.NOTUPDATED => "Unable to write display settings to registry.",
-                        _ => "Unknown error occured."
-                    };
-                    throw new CommandException("set", $"Display {displaySettings.DisplayIndex}: {errorMessage}");
+                    throw new CommandException("set", $"Display {displaySettings.DisplayIndex}: {result.Description}");
                 }
             }
         }
@@ -229,7 +223,7 @@ namespace DisplaySettingsChanger
             var displaysSettings = new List<DisplaySettings>();
             foreach (int displayIndex in displayIndices)
             {
-                displaysSettings.Add(DisplaySettings.GetCurrentDisplaySettings(displayIndex));
+                displaysSettings.Add(DisplaySettings.GetDisplaySettings(displayIndex));
             }
 
             if (doJsonFormatting)
@@ -248,7 +242,7 @@ namespace DisplaySettingsChanger
                     if (displaySettings.IsAttached)
                     {
                         Console.Write($"Display {displaySettings.DisplayIndex}{(isPrimary ? " (Primary)" : "")}:\n" +
-                                      $"  Mode index: \t{displaySettings.Mode.Index}\n" +
+                                      $"  Mode index: \t\t{displaySettings.Mode.Index}\n" +
                                       $"  Resolution: \t\t{displaySettings.Mode.Width}x{displaySettings.Mode.Height}\n" +
                                       $"  Refresh rate: \t{displaySettings.Mode.RefreshRate} Hz\n" +
                                       $"  Color bit depth: \t{displaySettings.Mode.BitDepth} bit\n" +

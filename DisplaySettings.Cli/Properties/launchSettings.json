@@ -3,14 +3,6 @@
     "DisplaySettingsChanger": {
       "commandName": "Project"
     },
-    "Store": {
-      "commandName": "Project",
-      "commandLineArgs": "store"
-    },
-    "Restore": {
-      "commandName": "Project",
-      "commandLineArgs": "restore"
-    },
     "Set 1080p60": {
       "commandName": "Project",
       "commandLineArgs": "set -w 1920 -h 1080 -r 60"
@@ -19,23 +11,23 @@
       "commandName": "Project",
       "commandLineArgs": "set -w 2560 -h 1440 -r 144"
     },
-    "Enum": {
+    "modes": {
       "commandName": "Project",
-      "commandLineArgs": "modes -j -d all"
+      "commandLineArgs": "modes -d all"
     },
-    "Get": {
+    "get": {
       "commandName": "Project",
-      "commandLineArgs": "get -j -d all"
+      "commandLineArgs": "get -d all"
     },
-    "Displays": {
+    "displays": {
       "commandName": "Project",
-      "commandLineArgs": "displays -j -a"
+      "commandLineArgs": "displays -a"
     },
-    "Set all": {
+    "set": {
       "commandName": "Project",
       "commandLineArgs": "set -j"
     },
-    "Help": {
+    "help": {
       "commandName": "Project",
       "commandLineArgs": "help"
     }

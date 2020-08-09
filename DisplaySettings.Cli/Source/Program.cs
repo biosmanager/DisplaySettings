@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace DisplaySettingsChanger
+namespace DisplaySettings.Cli
 {
     class Program
     {

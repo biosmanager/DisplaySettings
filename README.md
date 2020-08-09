@@ -1,6 +1,7 @@
-# Display Settings Changer ![.NET Core](https://github.com/biosmanager/DisplaySettingsChanger/workflows/.NET%20Core/badge.svg)
+# Display Settings ![.NET Core](https://github.com/biosmanager/DisplaySettingsChanger/workflows/.NET%20Core/badge.svg)
 
-The swiss army knife to change or retrieve display settings from the command line or scripts on Windows.
+The swiss army knife to change or retrieve display settings with a library or a CLI tool on Windows.
+The library targets **.NET Standard 2.0** and is therefore compatible with **.NET Framework 4.6.1 and higher**.
 
 ## Features
 
@@ -9,24 +10,35 @@ The swiss army knife to change or retrieve display settings from the command lin
 * Enumerate displays and available modes
 * Write and read settings to/from JSON either standard input/output or files
 
-## Examples
+## Projects
+
+| Project | Description | Target framework |
+|---------|-------------|------------------|
+| DisplaySettings | Library to change or retrieve display information and settings. | .NET Standard 2.0 |
+| DiplaySettings.Cli | Command line interface tool to do the same. | .NET Core 3.1 |
+
+## CLI
+
+You can use the command line interface tool to change or retrieve display information/settings.
+
+### Examples
 
 Set the resolution of the primary display:
 ```
-DisplaySettingsChanger set -d primary -w 1920 -h 1080
+DisplaySettings set -d primary -w 1920 -h 1080
 ```
 
 Save the current settings of display 2 and 3 to a file:
 ```
-DisplaySettingschanger get -d 2,3 -j -f settings.json
+DisplaySettings get -d 2,3 -j -f settings.json
 ```
 
 Write the current settings of all attached displays as JSON to standard output:
 ```
-DisplaySettingsChanger get -d attached -j
+DisplaySettings get -d attached -j
 ```
 
-## Usage
+### Usage
 
 ```
 set         Set display settings. Any present option will override the respective current display setting. For
@@ -44,9 +56,9 @@ help        Display more information on a specific command.
 version     Display version information.
 ```
 
-## Commands
+### Commands
 
-### set
+#### set
 
 ```
 -d, --displays       (Default: primary) The display(s) of interest. Can be either a comma-separated sequence of
@@ -77,7 +89,7 @@ version     Display version information.
 --version            Display version information.
 ```
 
-### get
+#### get
 
 ```
 -d, --displays    (Default: primary) The display(s) of interest. Can be either a comma-separated sequence of display
@@ -92,7 +104,7 @@ version     Display version information.
 --version         Display version information.
 ```
 
-### modes 
+#### modes 
 
 ```
 -d, --displays    (Default: primary) The display(s) of interest. Can be either a comma-separated sequence of display
