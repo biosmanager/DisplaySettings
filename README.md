@@ -19,7 +19,7 @@ The library targets **.NET Standard 2.0** and is therefore compatible with **.NE
 
 ## CLI
 
-You can use the command line interface tool to change or retrieve display information/settings.
+You can use the command line interface tool to change or retrieve display information/settings. This requires that you have the **.NET Core 3.1 x64 runtime** installed.
 
 ### Examples
 

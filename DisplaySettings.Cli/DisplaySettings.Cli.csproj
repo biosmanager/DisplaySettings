@@ -7,13 +7,14 @@
     <Authors>biosmanager</Authors>
     <Product />
     <Description>Change or retrieve display information and settings.</Description>
-    <Version>0.5.0</Version>
+    <Version>1.0.0</Version>
     <RepositoryUrl>https://github.com/biosmanager/DisplaySettingsChanger</RepositoryUrl>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <Copyright>© 2020 biosmanager</Copyright>
+    <Copyright>Copyright © 2020 biosmanager</Copyright>
     <PackageProjectUrl>https://github.com/biosmanager/DisplaySettingsChanger</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <Company />
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -27,6 +28,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DisplaySettings\DisplaySettings.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
