@@ -1,0 +1,51 @@
+name: .NET Core
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+        
+    - name: Install dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+      
+    - name: Publish
+      run: dotnet publish -p:PublishProfile=Release-Windows-x64-Single
+      
+    - name: Zip
+      run: mkdir -p /home/runner/work/DisplaySettingsChanger/artifact/-p && zip -j -r /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger/bin/Release/netcoreapp3.1/publish/
+      
+    - name: Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: DisplaySettingsChanger-Windows-x64
+        path: /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip
+        
+    - name: Release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Latest build"
+        files: |
+          /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip
