@@ -172,6 +172,9 @@ namespace DisplaySettingsChanger
     }
 
 
+    /// <summary>
+    /// Contains information about about a display adapter and all its monitors
+    /// </summary>
     public sealed class DisplayInformation
     {
         public sealed class Monitor
