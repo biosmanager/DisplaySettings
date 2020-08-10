@@ -17,7 +17,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.301
+        dotnet-version: 3.1.x
         
     - name: Install dependencies
       run: dotnet restore
@@ -29,18 +29,19 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
       
     - name: Publish
-      run: dotnet publish -p:PublishProfile=Release-Windows-x64-Single
-      
-    - name: Zip
-      run: mkdir -p /home/runner/work/DisplaySettingsChanger/artifact/-p && zip -j -r /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip /home/runner/work/DisplaySettingsChanger/DisplaySettingsChanger/DisplaySettingsChanger/bin/Release/netcoreapp3.1/publish/
-      
-    - name: Artifact
+      run: |
+        dotnet pack ${{ github.workspace }}/DisplaySettings/DisplaySettings.csproj -c Release
+        dotnet publish ${{ github.workspace }}/DisplaySettings.Cli/DisplaySettings.Cli.csproj -c Release -f netcoreapp3.1 -r win-x64 -p:PublishSingleFile=true --no-self-contained
+       
+    - name: Artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: DisplaySettingsChanger-Windows-x64
-        path: /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip
+        name: DisplaySettings
+        path: |
+          ${{ github.workspace }}/DisplaySettings/bin/Release/*.nupkg
+          ${{ github.workspace }}/DisplaySettings.Cli/bin/Release/netcoreapp3.1/win-x64/publish/*.exe
         
-    - name: Release
+    - name: Automatic release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -48,4 +49,5 @@ jobs:
         prerelease: true
         title: "Latest build"
         files: |
-          /home/runner/work/DisplaySettingsChanger/artifact/DisplaySettingsChanger-Windows-x64.zip
+          ${{ github.workspace }}/DisplaySettings/bin/Release/*.nupkg
+          ${{ github.workspace }}/DisplaySettings.Cli/bin/Release/netcoreapp3.1/win-x64/publish/*.exe

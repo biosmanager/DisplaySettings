@@ -1,7 +1,9 @@
-# Display Settings ![.NET Core](https://github.com/biosmanager/DisplaySettingsChanger/workflows/.NET%20Core/badge.svg)
+# Display Settings 
+[![.NET Core](https://github.com/biosmanager/DisplaySettingsChanger/workflows/.NET%20Core/badge.svg)](https://github.com/biosmanager/DisplaySettings/actions)
+[![Nuget](https://img.shields.io/nuget/v/DisplaySettings)](https://www.nuget.org/packages/DisplaySettings/)
 
 The swiss army knife to change or retrieve display settings with a library or a CLI tool on Windows.
-The library targets **.NET Standard 2.0** and is therefore compatible with **.NET Framework 4.6.1 and higher**.
+The library targets **.NET Standard 2.0** and is therefore compatible with **.NET Framework 4.6.1 and .NET Core 2.0 or higher**.
 
 ## Features
 
