@@ -135,11 +135,11 @@ namespace DisplaySettings
         [DllImport("user32.dll")]
         internal static extern bool EnumDisplayDevices(string lpDevice, uint iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, uint dwFlags);
         [DllImport("user32.dll")]
-        internal static extern int EnumDisplaySettingsEx(string lpszDeviceName, int iModeNum, ref DEVMODE lpDevMode, uint dwFlags);
+        internal static extern int EnumDisplaySettingsEx(string lpszDeviceName, uint iModeNum, ref DEVMODE lpDevMode, uint dwFlags);
         [DllImport("user32.dll")]
         internal static extern int ChangeDisplaySettingsEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);
 
-        internal const int ENUM_CURRENT_SETTINGS = -1;
-        internal const int ENUM_REGISTRY_SETTINGS = -2;
+        internal const uint ENUM_CURRENT_SETTINGS = unchecked((uint)-1);
+        internal const uint ENUM_REGISTRY_SETTINGS = unchecked((uint)-2);
     }
 }

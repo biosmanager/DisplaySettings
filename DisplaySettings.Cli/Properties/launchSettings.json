@@ -17,7 +17,7 @@
     },
     "get": {
       "commandName": "Project",
-      "commandLineArgs": "get -d all"
+      "commandLineArgs": "get -d all -j"
     },
     "displays": {
       "commandName": "Project",

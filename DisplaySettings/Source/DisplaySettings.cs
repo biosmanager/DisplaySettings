@@ -64,7 +64,7 @@ namespace DisplaySettings
             }
         }
 
-        public enum SettingsType : int
+        public enum SettingsType : uint
         {
             Current = ENUM_CURRENT_SETTINGS,
             Registry = ENUM_REGISTRY_SETTINGS
@@ -73,10 +73,10 @@ namespace DisplaySettings
         public sealed class GraphicsMode
         {
             public int Index { get; set; }
-            public int Width { get; set; }
-            public int Height { get; set; }
-            public int RefreshRate { get; set; }
-            public int BitDepth { get; set; }
+            public uint Width { get; set; }
+            public uint Height { get; set; }
+            public uint RefreshRate { get; set; }
+            public uint BitDepth { get; set; }
         }
 
         public struct Position
@@ -86,31 +86,28 @@ namespace DisplaySettings
         }
 
 
-        public int DisplayIndex { get; set; }
+        public uint DisplayIndex { get; set; }
         public GraphicsMode Mode { get; set; }
         public Position DesktopPosition { get; set; }
         public bool IsAttached { get; set; }
+        public bool IsPrimary { get; set; }
 
 
         public static DisplaySettingsChangedResult ChangeDisplaySettings(DisplaySettings displaySettings)
         {
-            displaySettings.DisplayIndex = Math.Max(displaySettings.DisplayIndex, 0);
+            var adapter = new Adapter(displaySettings.DisplayIndex);
 
-            DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
             DEVMODE dm = DEVMODE.Create();
-
-            EnumDisplayDevices(null, (uint)displaySettings.DisplayIndex, ref d, 1);
-
-            if (0 != EnumDisplaySettingsEx(d.DeviceName, ENUM_CURRENT_SETTINGS, ref dm, 0))
+            if (0 != EnumDisplaySettingsEx(adapter.Name, ENUM_CURRENT_SETTINGS, ref dm, 0))
             {
-                dm.dmPelsWidth = (uint)displaySettings.Mode.Width;
-                dm.dmPelsHeight = (uint)displaySettings.Mode.Height;
-                dm.dmDisplayFrequency = (uint)displaySettings.Mode.RefreshRate;
-                dm.dmBitsPerPel = (uint)displaySettings.Mode.BitDepth;
+                dm.dmPelsWidth = displaySettings.Mode.Width;
+                dm.dmPelsHeight = displaySettings.Mode.Height;
+                dm.dmDisplayFrequency = displaySettings.Mode.RefreshRate;
+                dm.dmBitsPerPel = displaySettings.Mode.BitDepth;
                 dm.dmPosition.x = displaySettings.DesktopPosition.X;
                 dm.dmPosition.y = displaySettings.DesktopPosition.Y;
 
-                int iRet = ChangeDisplaySettingsEx(d.DeviceName, ref dm, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_TEST, IntPtr.Zero);
+                int iRet = ChangeDisplaySettingsEx(adapter.Name, ref dm, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_TEST, IntPtr.Zero);
 
                 if (iRet == (int)DisplaySettingsChangedResult.ChangeStatus.FAILED)
                 {
@@ -118,7 +115,7 @@ namespace DisplaySettings
                 }
                 else
                 {
-                    iRet = ChangeDisplaySettingsEx(d.DeviceName, ref dm, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_UPDATEREGISTRY, IntPtr.Zero);
+                    iRet = ChangeDisplaySettingsEx(adapter.Name, ref dm, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_UPDATEREGISTRY, IntPtr.Zero);
 
                     return new DisplaySettingsChangedResult(iRet);
                 }
@@ -129,34 +126,34 @@ namespace DisplaySettings
             }
         }
 
-        public static DisplaySettings GetDisplaySettings(int displayIndex, SettingsType type = SettingsType.Current)
+        public static DisplaySettings GetDisplaySettings(uint displayIndex, SettingsType type = SettingsType.Current)
         {
             displayIndex = Math.Max(displayIndex, 0);
 
-            DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
-            DEVMODE dm = DEVMODE.Create();
 
-            EnumDisplayDevices(null, (uint)displayIndex, ref d, 1);
-            var isAttached = ((DisplayInformation.DisplayDeviceStateFlags)d.StateFlags).HasFlag(DisplayInformation.DisplayDeviceStateFlags.AttachedToDesktop);
-            EnumDisplaySettingsEx(d.DeviceName, (int)type, ref dm, 0);
+            var adapter = new Adapter(displayIndex);
+
+            DEVMODE dm = DEVMODE.Create();
+            EnumDisplaySettingsEx(adapter.Name, (uint)type, ref dm, 0);
 
             var displaySettings = new DisplaySettings()
             {
                 DisplayIndex = displayIndex,
                 Mode = new GraphicsMode
                 {
-                    Width = (int)dm.dmPelsWidth,
-                    Height = (int)dm.dmPelsHeight,
-                    RefreshRate = (int)dm.dmDisplayFrequency,
-                    BitDepth = (int)dm.dmBitsPerPel
+                    Width = dm.dmPelsWidth,
+                    Height = dm.dmPelsHeight,
+                    RefreshRate = dm.dmDisplayFrequency,
+                    BitDepth = dm.dmBitsPerPel
                 },
                 DesktopPosition = new Position { X = dm.dmPosition.x, Y = dm.dmPosition.y },
-                IsAttached = isAttached
+                IsAttached = adapter.IsAttached,
+                IsPrimary = adapter.IsPrimary
             };
 
             // Find mode number
             displaySettings.Mode.Index = -1;
-            for (int iModeNum = 0; EnumDisplaySettingsEx(d.DeviceName, iModeNum, ref dm, 0) != 0; iModeNum++)
+            for (uint iModeNum = 0; EnumDisplaySettingsEx(adapter.Name, iModeNum, ref dm, 0) != 0; iModeNum++)
             {
                 var isModeMatch = displaySettings.Mode.Width == dm.dmPelsWidth &&
                                   displaySettings.Mode.Height == dm.dmPelsHeight &&
@@ -165,7 +162,7 @@ namespace DisplaySettings
 
                 if (isModeMatch)
                 {
-                    displaySettings.Mode.Index = iModeNum;
+                    displaySettings.Mode.Index = (int)iModeNum;
                     break;
                 }
             }
@@ -173,30 +170,22 @@ namespace DisplaySettings
             return displaySettings;
         }
 
-        public static GraphicsMode[] EnumerateAllDisplayModes(int displayIndex)
+        public static IEnumerable<GraphicsMode> EnumerateGraphicsModes(uint displayIndex)
         {
-            var displayModes = new List<GraphicsMode>();
+            var adapter = new Adapter(displayIndex);
 
-            displayIndex = Math.Max(displayIndex, 0);
-
-            DISPLAY_DEVICE d = DISPLAY_DEVICE.Create();
             DEVMODE dm = DEVMODE.Create();
-
-            EnumDisplayDevices(null, (uint)displayIndex, ref d, 1);
-
-            for (int iModeNum = 0; EnumDisplaySettingsEx(d.DeviceName, iModeNum, ref dm, 0) != 0; iModeNum++)
+            for (uint iModeNum = 0; EnumDisplaySettingsEx(adapter.Name, iModeNum, ref dm, 0) != 0; iModeNum++)
             {
-                displayModes.Add(new GraphicsMode
+                yield return new GraphicsMode
                 {
-                    Index = iModeNum,
-                    Width = (int)dm.dmPelsWidth,
-                    Height = (int)dm.dmPelsHeight,
-                    RefreshRate = (int)dm.dmDisplayFrequency,
-                    BitDepth = (int)dm.dmBitsPerPel
-                });
+                    Index = (int)iModeNum,
+                    Width = dm.dmPelsWidth,
+                    Height = dm.dmPelsHeight,
+                    RefreshRate = dm.dmDisplayFrequency,
+                    BitDepth = dm.dmBitsPerPel
+                };
             }
-
-            return displayModes.ToArray();
         }
     }
 }

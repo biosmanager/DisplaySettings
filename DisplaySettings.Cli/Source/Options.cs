@@ -18,16 +18,16 @@ namespace DisplaySettings.Cli
             public IEnumerable<string> Displays { get; set; }
 
             [Option('w', "width", Required = false, HelpText = "Width in pixels.")]
-            public int? Width { get; set; } = null;
+            public uint? Width { get; set; } = null;
 
             [Option('h', "height", Required = false, HelpText = "Height in pixels.")]
-            public int? Height { get; set; } = null;
+            public uint? Height { get; set; } = null;
 
             [Option('r', "refreshRate", Required = false, HelpText = "Refresh rate in Hertz. A value of 0 or 1 indicates the default refresh rate of the display.")]
-            public int? RefreshRate { get; set; } = null;
+            public uint? RefreshRate { get; set; } = null;
 
             [Option('b', "bitDepth", Required = false, HelpText = "Bits per pixel for all channels including alpha.")]
-            public int? BitDepth { get; set; } = null;
+            public uint? BitDepth { get; set; } = null;
 
             [Option("positionX", Required = false, HelpText = "X position of the display in the multi-monitor desktop configuration. The primary display has (0, 0).")]
             public int? PositionX { get; set; } = null;

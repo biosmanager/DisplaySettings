@@ -6,7 +6,7 @@ namespace DisplaySettings
 {
     public static class Util
     {
-        public static string BitDepthToName(int bitDepth)
+        public static string BitDepthToName(uint bitDepth)
         {
             switch (bitDepth)
             {
