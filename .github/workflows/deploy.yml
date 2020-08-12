@@ -1,0 +1,31 @@
+name: Deploy release
+
+on:
+  release:
+  push:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@latest
+      with:
+        dotnet-version: 3.1.x
+        source-url: https://nuget.pkg.github.com/biosmanager/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+    - name: Pack
+      run: dotnet pack DisplaySettings --configuration Release
+
+    - name: Deploy nuget.org
+      run: dotnet nuget push DisplaySettings/bin/Release/*.nupkg -s nuget.org -k ${{ secrets.NUGET_TOKEN }}
+      
+    - name: Deploy GitHub Packages
+      run: dotnet nuget push DisplaySettings/bin/Release/*.nupkg
