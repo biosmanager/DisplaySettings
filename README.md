@@ -17,7 +17,7 @@ The library targets **.NET Standard 2.0** and is therefore compatible with **.NE
 | Project | Description | Target framework |
 |---------|-------------|------------------|
 | DisplaySettings | Library to change or retrieve display information and settings. | .NET Standard 2.0 |
-| DiplaySettings.Cli | Command line interface tool to do the same. | .NET Core 3.1 |
+| DisplaySettings.Cli | Command line interface tool to do the same. | .NET Core 3.1 |
 
 ## CLI
 
