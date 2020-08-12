@@ -7,44 +7,126 @@ using static DisplaySettings.SafeNativeMethods;
 namespace DisplaySettings
 {
     /// <summary>
-    /// Contains information about about a display adapter and all its monitors
+    /// Contains information about about a display adapter and all its monitors.
     /// </summary>
     public sealed class DisplayInformation
     {
-        // Flags based on wingdi.h from Windows SDK 10.0.16299.0
+        /// <summary>
+        /// States of a of display adapter or monitor.
+        /// </summary>
+        /// <remarks>
+        /// Flags based on wingdi.h from Windows SDK 10.0.16299.0.
+        /// </remarks>
         [Flags]
         public enum DisplayDeviceStateFlags : uint
         {
+            /// <summary>
+            /// Device is currently attached to the desktop.
+            /// </summary>
             AttachedToDesktop = 0x00000001,
+            /// <summary>
+            /// Not documented.
+            /// </summary>
             MultiDriver = 0x00000002,
+            /// <summary>
+            /// Device is the primary device.
+            /// </summary>
             PrimaryDevice = 0x00000004,
+            /// <summary>
+            /// Device is mirroring another device.
+            /// </summary>
             MirroringDriver = 0x00000008,
+            /// <summary>
+            /// Not documented.
+            /// </summary>
             VgaCompatible = 0x00000010,
+            /// <summary>
+            /// Not documented.
+            /// </summary>
             Removable = 0x00000020,
+            /// <summary>
+            /// Not documented.
+            /// </summary>
             AccDriver = 0x00000040,
+            /// <summary>
+            /// Not documented.
+            /// </summary>
             ModesPruned = 0x08000000,
+            /// <summary>
+            /// Not documented.
+            /// </summary>
             RdpUdd = 0x01000000,
+            /// <summary>
+            /// Not documented.
+            /// </summary>
             Remote = 0x04000000,
+            /// <summary>
+            /// Not documented.
+            /// </summary>
             Disconnect = 0x02000000,
+            /// <summary>
+            /// Not documented.
+            /// </summary>
             TSCompatible = 0x00200000,
+            /// <summary>
+            /// Device has unsafe graphics modes enabled.
+            /// </summary>
             UnsafeModesOn = 0x00080000
         }
 
+        /// <summary>
+        /// Monitor device
+        /// </summary>
         public sealed class Monitor
         {
+            /// <summary>
+            /// Index on adapter. It can be -1 if the mode cannot be found in all available modes for a display.
+            /// </summary>
             public int MonitorIndex { get; set; }
+            /// <summary>
+            /// Path on adapter.
+            /// </summary>
             public string Name { get; set; }
+            /// <summary>
+            /// Name of the monitor.
+            /// </summary>
             public string Description { get; set; }
+            /// <summary>
+            /// Current states of the monitor.
+            /// </summary>
             public DisplayDeviceStateFlags StateFlags { get; set; }
+            /// <summary>
+            /// Device interface name and GUID. Can be used with SetupAPI.
+            /// </summary>
             public string InterfaceName { get; set; }
         }
 
+        /// <summary>
+        /// Index of the adapter/display.
+        /// </summary>
         public int DisplayIndex { get; set; }
+        /// <summary>
+        /// Adapter path.
+        /// </summary>
         public string AdapterName { get; set; }
+        /// <summary>
+        /// Name of the adapter.
+        /// </summary>
         public string AdapterDescription { get; set; }
+        /// <summary>
+        /// Current states of the adapter.
+        /// </summary>
         public DisplayDeviceStateFlags AdapterStateFlags { get; set; }
+        /// <summary>
+        /// All monitors associated with the adapter.
+        /// </summary>
         public Monitor[] Monitors { get; set; }
 
+
+        /// <summary>
+        /// Retrieves information about the adapter/display and its associated monitors.
+        /// </summary>
+        /// <param name="displayIndex">Adapter/display of interest.</param>
         public static DisplayInformation GetAdapterAndDisplayInformation(int displayIndex)
         {
             displayIndex = Math.Max(displayIndex, 0);
@@ -75,6 +157,11 @@ namespace DisplaySettings
             return displayInfo;
         }
 
+        /// <summary>
+        /// Lists all displays on the system.
+        /// </summary>
+        /// <param name="doOnlyListAttached">Determines if only displays/adapters that are attached to the desktop should be considered.</param>
+        /// <returns>Can be empty if no adapters/displays are present.</returns>
         public static DisplayInformation[] EnumerateAllDisplays(bool doOnlyListAttached = false)
         {
             var displayInformations = new List<DisplayInformation>();
@@ -119,6 +206,9 @@ namespace DisplaySettings
             return displayInformations.ToArray();
         }
 
+        /// <summary>
+        /// Find index of primary display/adapter.
+        /// </summary>
         public static int FindPrimaryDisplayIndex()
         {
             var devices = EnumerateAllDisplays(true);
