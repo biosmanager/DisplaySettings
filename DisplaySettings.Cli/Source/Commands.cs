@@ -36,18 +36,18 @@ namespace DisplaySettings.Cli
 
         internal class DisplayInformationWithModes
         {
-            public DisplayInformation Info { get; set; }
+            public Adapter Adapter { get; set; }
             public DisplaySettings.GraphicsMode[] Modes { get; set; }
         }
 
 
-        public static void SetDisplaySettings(IEnumerable<string> displays, int? width = null, int? height = null, int? refreshRate = null, int? bitDepth = null, int? positionX = null, int? positionY = null, bool doJsonFormatting = false, string jsonFilePath = null)
+        public static void SetDisplaySettings(IEnumerable<string> displays, uint? width = null, uint? height = null, uint? refreshRate = null, uint? bitDepth = null, int? positionX = null, int? positionY = null, bool doJsonFormatting = false, string jsonFilePath = null)
         {
             var commandName = "set";
 
             ValidateJsonOptions(commandName, doJsonFormatting, jsonFilePath);
 
-            int[] displayIndices;
+            uint[] displayIndices;
             try
             {
                 displayIndices = ParseDisplays(displays);
@@ -152,19 +152,19 @@ namespace DisplaySettings.Cli
 
                 if (width != null)
                 {
-                    displaySettings.Mode.Width = (int)width;
+                    displaySettings.Mode.Width = (uint)width;
                 }
                 if (height != null)
                 {
-                    displaySettings.Mode.Height = (int)height;
+                    displaySettings.Mode.Height = (uint)height;
                 }
                 if (refreshRate != null)
                 {
-                    displaySettings.Mode.RefreshRate = (int)refreshRate;
+                    displaySettings.Mode.RefreshRate = (uint)refreshRate;
                 }
                 if (bitDepth != null)
                 {
-                    displaySettings.Mode.BitDepth = (int)bitDepth;
+                    displaySettings.Mode.BitDepth = (uint)bitDepth;
                 }
                 if (positionX != null)
                 {
@@ -210,7 +210,7 @@ namespace DisplaySettings.Cli
 
             ValidateJsonOptions(commandName, doJsonFormatting, jsonFilePath);
 
-            int[] displayIndices;
+            uint[] displayIndices;
             try
             {
                 displayIndices = ParseDisplays(displays);
@@ -221,7 +221,7 @@ namespace DisplaySettings.Cli
             }
 
             var displaysSettings = new List<DisplaySettings>();
-            foreach (int displayIndex in displayIndices)
+            foreach (var displayIndex in displayIndices)
             {
                 displaysSettings.Add(DisplaySettings.GetDisplaySettings(displayIndex));
             }
@@ -238,10 +238,9 @@ namespace DisplaySettings.Cli
             {
                 foreach (var displaySettings in displaysSettings)
                 {
-                    var isPrimary = displaySettings.IsAttached && displaySettings.DesktopPosition.X == 0 && displaySettings.DesktopPosition.Y == 0;
                     if (displaySettings.IsAttached)
                     {
-                        Console.Write($"Display {displaySettings.DisplayIndex}{(isPrimary ? " (Primary)" : "")}:\n" +
+                        Console.Write($"Display {displaySettings.DisplayIndex}{(displaySettings.IsPrimary ? " (Primary)" : "")}:\n" +
                                       $"  Mode index: \t\t{displaySettings.Mode.Index}\n" +
                                       $"  Resolution: \t\t{displaySettings.Mode.Width}x{displaySettings.Mode.Height}\n" +
                                       $"  Refresh rate: \t{displaySettings.Mode.RefreshRate} Hz\n" +
@@ -263,7 +262,7 @@ namespace DisplaySettings.Cli
 
             ValidateJsonOptions(commandName, doJsonFormatting, jsonFilePath);
 
-            int[] displayIndices;
+            uint[] displayIndices;
             try
             {
                 displayIndices = ParseDisplays(displays);
@@ -278,8 +277,8 @@ namespace DisplaySettings.Cli
             {
                 infosWithModes.Add(new DisplayInformationWithModes
                 {
-                    Info = DisplayInformation.GetAdapterAndDisplayInformation(displayIndex),
-                    Modes = DisplaySettings.EnumerateAllDisplayModes(displayIndex)
+                    Adapter = new Adapter(displayIndex),
+                    Modes = DisplaySettings.EnumerateAllDisplayModes(displayIndex).ToArray()
                 });
             }
 
@@ -295,9 +294,9 @@ namespace DisplaySettings.Cli
             {
                 foreach (var infoWithModes in infosWithModes)
                 {
-                    Console.Write($"Display {infoWithModes.Info.DisplayIndex}:\n" +
-                                  $"  Adapter name: \t{infoWithModes.Info.AdapterName}\n" +
-                                  $"  Adapter description: \t{infoWithModes.Info.AdapterDescription}\n");
+                    Console.Write($"Display {infoWithModes.Adapter.Index}:\n" +
+                                  $"  Adapter name: \t{infoWithModes.Adapter.Name}\n" +
+                                  $"  Adapter description: \t{infoWithModes.Adapter.Description}\n");
                     Console.WriteLine($"Graphics modes:");
                     for (int modeIndex = 0; modeIndex < infoWithModes.Modes.Length; modeIndex++)
                     {
@@ -315,11 +314,11 @@ namespace DisplaySettings.Cli
 
             ValidateJsonOptions(commandName, doJsonFormatting, jsonFilePath);
 
-            var displayInformations = DisplayInformation.EnumerateAllDisplays(doOnlyListAttached);
+            var adapters = Adapter.EnumerateAdapters(doOnlyListAttached).ToArray();
 
             if (doJsonFormatting)
             {
-                WriteJson(commandName, jsonFilePath, displayInformations);
+                WriteJson(commandName, jsonFilePath, adapters);
                 if (!string.IsNullOrWhiteSpace(jsonFilePath))
                 {
                     Console.WriteLine($"Wrote display information to {Path.GetFullPath(jsonFilePath)}.");
@@ -327,17 +326,17 @@ namespace DisplaySettings.Cli
             }
             else
             {
-                for (int displayIndex = 0; displayIndex < displayInformations.Length; displayIndex++)
+                for (int displayIndex = 0; displayIndex < adapters.Length; displayIndex++)
                 {
-                    var info = displayInformations[displayIndex];
+                    var adapter = adapters[displayIndex];
                     Console.Write($"Display {displayIndex}:\n" +
-                                  $"  Adapter name: \t{info.AdapterName}\n" +
-                                  $"  Adapter description: \t{info.AdapterDescription}\n" +
-                                  $"  Adapter state: \t{info.AdapterStateFlags}\n" +
+                                  $"  Adapter name: \t{adapter.Name}\n" +
+                                  $"  Adapter description: \t{adapter.Description}\n" +
+                                  $"  Adapter state: \t{adapter.StateFlags}\n" +
                                   $"  Monitors:\n");
-                    foreach (var monitor in info.Monitors)
+                    foreach (var monitor in adapter.Monitors)
                     {
-                        Console.Write($"    Monitor {monitor.MonitorIndex}:\n" +
+                        Console.Write($"    Monitor {monitor.Index}:\n" +
                                       $"      Name: \t\t{monitor.Name}\n" +
                                       $"      Description: \t{monitor.Description}\n" +
                                       $"      State: \t\t{monitor.StateFlags}\n" +
@@ -360,7 +359,7 @@ namespace DisplaySettings.Cli
             }
         }
 
-        private static int[] ParseDisplays(IEnumerable<string> displays)
+        private static uint[] ParseDisplays(IEnumerable<string> displays)
         {
             if (displays is null)
             {
@@ -371,10 +370,10 @@ namespace DisplaySettings.Cli
                 throw new ArgumentOutOfRangeException("displays", "Must at least specify one display of interest.");
             }
 
-            var displayIndices = new List<int>();
+            var displayIndices = new List<uint>();
             if (!displays.Any())
             {
-                displayIndices.Add(DisplayInformation.FindPrimaryDisplayIndex());
+                displayIndices.Add(Adapter.GetPrimaryAdapter().Index);
             }
             else if (displays.Count() == 1)
             {
@@ -382,22 +381,22 @@ namespace DisplaySettings.Cli
 
                 if (display == "primary")
                 {
-                    displayIndices.Add(DisplayInformation.FindPrimaryDisplayIndex());
+                    displayIndices.Add(Adapter.GetPrimaryAdapter().Index);
                 }
                 else if (display == "all")
                 {
-                    var devices = DisplayInformation.EnumerateAllDisplays(false);
-                    foreach (var device in devices)
+                    var adapters = Adapter.EnumerateAdapters(doOnlyListAttached: false);
+                    foreach (var adapter in adapters)
                     {
-                        displayIndices.Add(device.DisplayIndex);
+                        displayIndices.Add(adapter.Index);
                     }
                 }
                 else if (display == "attached")
                 {
-                    var devices = DisplayInformation.EnumerateAllDisplays(true);
-                    foreach (var device in devices)
+                    var adapters = Adapter.EnumerateAdapters(doOnlyListAttached: true);
+                    foreach (var adapter in adapters)
                     {
-                        displayIndices.Add(device.DisplayIndex);
+                        displayIndices.Add(adapter.Index);
                     }
                 }
                 else
@@ -411,7 +410,7 @@ namespace DisplaySettings.Cli
                 {
                     if (display == "primary")
                     {
-                        displayIndices.Add(DisplayInformation.FindPrimaryDisplayIndex());
+                        displayIndices.Add(Adapter.GetPrimaryAdapter().Index);
                     }
                     else
                     {
@@ -429,11 +428,11 @@ namespace DisplaySettings.Cli
             return displayIndices.ToArray();
         }
 
-        private static int ParseDisplayIndex(string displayIndex)
+        private static uint ParseDisplayIndex(string displayIndex)
         {
             try
             {
-                return Int32.Parse(displayIndex);
+                return uint.Parse(displayIndex);
             }
             catch (Exception e) when (e is FormatException || e is OverflowException)
             {

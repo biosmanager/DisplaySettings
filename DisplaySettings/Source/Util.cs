@@ -14,7 +14,7 @@ namespace DisplaySettings
         /// </summary>
         /// <param name="bitDepth">Bit depth in bits per pixel for all channels.</param>
         /// <returns><c>High Color</c> for 24 bit, <c>True Color</c> for 32 bit, empty string for all other bit depths.</returns>
-        public static string BitDepthToName(int bitDepth)
+        public static string BitDepthToName(uint bitDepth)
         {
             switch (bitDepth)
             {
